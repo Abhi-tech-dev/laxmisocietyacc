@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#102b50" />
+  <meta name="description" content="Customer account ledger and transaction statement for Delhi Laxmi Co-operative Thrift & Credit Society." />
+  <title>Customer Account Ledger | Delhi Laxmi Co-operative</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div class="mobile-overlay" id="mobileOverlay" hidden></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="brand-block">
+        <div class="brand-logo-wrap">
+          <img src="delhi-laxmi-logo.png" alt="Delhi Laxmi Society logo" class="brand-logo" onerror="this.hidden=true; document.getElementById('logoFallback').hidden=false;" />
+          <span class="logo-fallback" id="logoFallback" hidden>DL</span>
+        </div>
+        <div class="brand-copy">
+          <strong>Delhi Laxmi</strong>
+          <span>Co-operative Society</span>
+        </div>
+        <button class="icon-button sidebar-close" id="closeSidebar" type="button" aria-label="Close navigation">×</button>
+      </div>
+
+      <div class="nav-caption">WORKSPACE</div>
+      <nav class="main-nav">
+        <a class="nav-link active" href="#statement" aria-current="page"><span class="nav-symbol">▤</span> Account Statement</a>
+        <a class="nav-link" href="#accountDetails"><span class="nav-symbol">♙</span> Account Details</a>
+        <a class="nav-link" href="#transactionEntry"><span class="nav-symbol">＋</span> Add Transaction</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-divider"></div>
+        <div class="society-mini">
+          <span class="mini-shield">✓</span>
+          <div><strong>Member Services</strong><small>Thrift &amp; Credit Society</small></div>
+        </div>
+        <p class="sidebar-footnote">Customer Ledger Portal<br />For authorised society use</p>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-toggle" id="openSidebar" type="button" aria-label="Open navigation">☰</button>
+          <div>
+            <div class="breadcrumb">Workspace <span>/</span> Customer Accounts</div>
+            <h1>Account Statement</h1>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span class="secure-label"><span class="secure-dot"></span> Ledger workspace</span>
+          <div class="staff-avatar" aria-label="Staff workspace">DL</div>
+        </div>
+      </header>
+
+      <div class="page-content" id="statement">
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">CUSTOMER FINANCIAL RECORD</p>
+            <h2>Customer Account Ledger</h2>
+            <p class="intro-copy">Manage deposits, withdrawals and account balances in one clear statement.</p>
+          </div>
+          <div class="page-actions no-print">
+            <button class="button button-secondary" id="exportCsvButton" type="button"><span>⇩</span> Export Excel CSV</button>
+            <button class="button button-primary" id="printButton" type="button"><span>▣</span> Print / Save PDF</button>
+          </div>
+        </section>
+
+        <section class="panel account-panel" id="accountDetails">
+          <div class="panel-heading">
+            <div class="heading-icon">♙</div>
+            <div><h3>Account Holder Information</h3><p>Enter or update the customer's account details below.</p></div>
+            <span class="record-status"><span></span> Statement ready</span>
+          </div>
+          <div class="account-grid">
+            <label class="field"><span>Account Holder Name</span><input id="holderName" type="text" placeholder="Enter full name" autocomplete="name" /></label>
+            <label class="field"><span>Account Number</span><input id="accountNumber" type="text" placeholder="e.g. DLCS-10001" /></label>
+            <label class="field"><span>Membership Number</span><input id="membershipNumber" type="text" placeholder="Enter membership no." /></label>
+            <label class="field"><span>Account Type</span><select id="accountType"><option value="Savings">Savings</option><option value="Thrift">Thrift</option><option value="Recurring Deposit">Recurring Deposit</option><option value="Loan">Loan</option><option value="Current">Current</option><option value="Other">Other</option></select></label>
+            <label class="field"><span>Mobile Number</span><input id="mobileNumber" type="tel" inputmode="numeric" maxlength="15" placeholder="Enter mobile number" /></label>
+            <label class="field"><span>Statement From</span><input id="periodFrom" type="date" /></label>
+            <label class="field"><span>Statement To</span><input id="periodTo" type="date" /></label>
+            <label class="field"><span>Opening Balance (₹)</span><input id="openingBalance" type="number" min="0" step="0.01" value="0.00" inputmode="decimal" /></label>
+          </div>
+          <div class="account-actions no-print">
+            <p>Changes are saved in this browser automatically.</p>
+            <div class="inline-actions">
+              <button class="text-button" id="clearAccountButton" type="button">Clear form</button>
+              <button class="button button-primary button-small" id="saveAccountButton" type="button">Save account details</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="summary-grid" aria-label="Account summary">
+          <article class="summary-card">
+            <div><span class="summary-label">Opening Balance</span><strong class="summary-value" id="openingSummary">₹0.00</strong><small>Balance brought forward</small></div>
+            <span class="summary-icon icon-blue">↗</span>
+          </article>
+          <article class="summary-card">
+            <div><span class="summary-label">Total Credit</span><strong class="summary-value positive" id="creditSummary">₹0.00</strong><small>Total amount received</small></div>
+            <span class="summary-icon icon-green">＋</span>
+          </article>
+          <article class="summary-card">
+            <div><span class="summary-label">Total Debit</span><strong class="summary-value negative" id="debitSummary">₹0.00</strong><small>Total amount withdrawn</small></div>
+            <span class="summary-icon icon-red">−</span>
+          </article>
+          <article class="summary-card summary-card-highlight">
+            <div><span class="summary-label">Closing Balance</span><strong class="summary-value" id="closingSummary">₹0.00</strong><small>Available account balance</small></div>
+            <span class="summary-icon icon-white">₹</span>
+          </article>
+        </section>
+
+        <section class="panel entry-panel no-print" id="transactionEntry">
+          <div class="panel-heading compact-heading">
+            <div class="heading-icon">＋</div>
+            <div><h3>Add New Transaction</h3><p>Enter one credit or debit transaction at a time.</p></div>
+          </div>
+          <form id="transactionForm" class="transaction-form">
+            <label class="field"><span>Transaction Date</span><input id="transactionDate" type="date" required /></label>
+            <label class="field"><span>Transaction ID</span><input id="transactionId" type="text" placeholder="Auto-generated if blank" /></label>
+            <label class="field field-wide"><span>Particulars / Description</span><input id="particulars" type="text" placeholder="e.g. Cash Deposit" required maxlength="120" /></label>
+            <label class="field"><span>Credit (₹)</span><input id="creditInput" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal" /></label>
+            <label class="field"><span>Debit (₹)</span><input id="debitInput" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal" /></label>
+            <button class="button button-primary add-transaction-button" type="submit"><span>＋</span> Add Transaction</button>
+          </form>
+          <p class="form-hint">Enter an amount in either Credit or Debit. Both fields cannot contain an amount at the same time.</p>
+        </section>
+
+        <section class="panel ledger-panel">
+          <div class="ledger-topline">
+            <div><h3>Transaction History</h3><p>Chronological account activity and running balance.</p></div>
+            <span class="transaction-count" id="transactionCount">0 transactions</span>
+          </div>
+          <div class="filter-bar no-print">
+            <label class="search-field"><span>⌕</span><input id="searchInput" type="search" placeholder="Search transaction ID or particulars..." /></label>
+            <div class="filter-dates"><label><span>From</span><input id="filterFrom" type="date" /></label><label><span>To</span><input id="filterTo" type="date" /></label><button class="button button-quiet" id="clearFiltersButton" type="button">Clear filters</button></div>
+          </div>
+          <div class="table-scroll">
+            <table class="ledger-table">
+              <thead><tr><th class="col-sno">S.No.</th><th>Date</th><th>Transaction ID</th><th>Particulars / Description</th><th class="align-right">Credit (₹)</th><th class="align-right">Debit (₹)</th><th class="align-right">Balance (₹)</th><th class="no-print action-column">Action</th></tr></thead>
+              <tbody id="transactionTableBody"><tr><td colspan="8" class="empty-state"><span class="empty-icon">▤</span><strong>No transactions yet</strong><small>Add a transaction above to build this account ledger.</small></td></tr></tbody>
+            </table>
+          </div>
+          <div class="ledger-summary">
+            <div class="ledger-total"><span>Total Credit</span><strong class="positive" id="tableCreditTotal">₹0.00</strong></div>
+            <div class="ledger-total"><span>Total Debit</span><strong class="negative" id="tableDebitTotal">₹0.00</strong></div>
+            <div class="ledger-total"><span>Opening Balance</span><strong id="tableOpeningTotal">₹0.00</strong></div>
+            <div class="ledger-total closing-total"><span>Closing Balance</span><strong id="tableClosingTotal">₹0.00</strong></div>
+          </div>
+        </section>
+
+        <footer class="page-footer"><span>© <span id="currentYear"></span> Delhi Laxmi Co-operative Thrift &amp; Credit Society</span><span>Computer-generated account statement</span></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <!-- Inline application logic: account details, ledger calculations, validation and exports. -->
+  <script>
+/* Delhi Laxmi Co-operative - Customer Account Ledger
+ * Vanilla JavaScript controller for account details, transactions, totals and exports.
+ * Data is stored locally in this browser; connect a secured backend for shared production use.
+ */
+
+'use strict';
+
+const STORAGE_KEY = 'delhiLaxmiLedger.v1';
+const CURRENCY_FORMATTER = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
+const elements = {
+  holderName: document.getElementById('holderName'),
+  accountNumber: document.getElementById('accountNumber'),
+  membershipNumber: document.getElementById('membershipNumber'),
+  accountType: document.getElementById('accountType'),
+  mobileNumber: document.getElementById('mobileNumber'),
+  periodFrom: document.getElementById('periodFrom'),
+  periodTo: document.getElementById('periodTo'),
+  openingBalance: document.getElementById('openingBalance'),
+  transactionDate: document.getElementById('transactionDate'),
+  transactionId: document.getElementById('transactionId'),
+  particulars: document.getElementById('particulars'),
+  creditInput: document.getElementById('creditInput'),
+  debitInput: document.getElementById('debitInput'),
+  transactionForm: document.getElementById('transactionForm'),
+  transactionTableBody: document.getElementById('transactionTableBody'),
+  transactionCount: document.getElementById('transactionCount'),
+  searchInput: document.getElementById('searchInput'),
+  filterFrom: document.getElementById('filterFrom'),
+  filterTo: document.getElementById('filterTo'),
+  openingSummary: document.getElementById('openingSummary'),
+  creditSummary: document.getElementById('creditSummary'),
+  debitSummary: document.getElementById('debitSummary'),
+  closingSummary: document.getElementById('closingSummary'),
+  tableCreditTotal: document.getElementById('tableCreditTotal'),
+  tableDebitTotal: document.getElementById('tableDebitTotal'),
+  tableOpeningTotal: document.getElementById('tableOpeningTotal'),
+  tableClosingTotal: document.getElementById('tableClosingTotal'),
+  toastRegion: document.getElementById('toastRegion'),
+  sidebar: document.getElementById('sidebar'),
+  mobileOverlay: document.getElementById('mobileOverlay')
+};
+
+/* Return a fresh blank ledger state for a new account. */
+function createInitialState() {
+  return {
+    account: {
+      holderName: '',
+      accountNumber: '',
+      membershipNumber: '',
+      accountType: 'Savings',
+      mobileNumber: '',
+      periodFrom: '',
+      periodTo: '',
+      openingBalance: 0
+    },
+    transactions: []
+  };
+}
+
+/* Load saved data safely and fall back to a blank ledger if storage is unavailable or invalid. */
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return createInitialState();
+    const parsed = JSON.parse(saved);
+    return {
+      account: { ...createInitialState().account, ...(parsed.account || {}) },
+      transactions: Array.isArray(parsed.transactions) ? parsed.transactions : []
+    };
+  } catch (error) {
+    console.warn('Could not load saved ledger data:', error);
+    return createInitialState();
+  }
+}
+
+let state = loadState();
+
+/* Persist the complete account and transaction state in this browser. */
+function persistState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    showToast('Could not save data in this browser. Check storage permissions.', 'error');
+    console.error('Ledger storage failed:', error);
+  }
+}
+
+/* Format numeric values as Indian rupees with two decimal places. */
+function formatCurrency(value) {
+  return CURRENCY_FORMATTER.format(Number(value) || 0);
+}
+
+/* Convert a numeric input into a safe finite amount. */
+function toAmount(value) {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+/* Escape text before placing user-entered values into table markup. */
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[character]);
+}
+
+/* Convert an ISO date to DD-MM-YYYY for the visible account statement. */
+function formatDate(isoDate) {
+  if (!isoDate) return '—';
+  const parts = isoDate.split('-');
+  if (parts.length !== 3) return escapeHtml(isoDate);
+  return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
+
+/* Sort transactions by date, then by creation time for stable same-day ordering. */
+function getSortedTransactions() {
+  return [...state.transactions].sort((first, second) => {
+    const dateOrder = String(first.date).localeCompare(String(second.date));
+    if (dateOrder !== 0) return dateOrder;
+    return Number(first.createdAt || 0) - Number(second.createdAt || 0);
+  });
+}
+
+/* Calculate totals and a running balance from the opening balance forward. */
+function calculateLedger() {
+  const opening = toAmount(state.account.openingBalance);
+  let totalCredit = 0;
+  let totalDebit = 0;
+  let balance = opening;
+
+  const transactions = getSortedTransactions().map((transaction, index) => {
+    const credit = toAmount(transaction.credit);
+    const debit = toAmount(transaction.debit);
+    totalCredit += credit;
+    totalDebit += debit;
+    balance += credit - debit;
+    return { ...transaction, serialNumber: index + 1, balance };
+  });
+
+  return {
+    transactions,
+    opening,
+    totalCredit,
+    totalDebit,
+    closing: opening + totalCredit - totalDebit
+  };
+}
+
+/* Show a short accessible feedback message after an action. */
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast${type === 'error' ? ' error' : ''}`;
+  toast.textContent = message;
+  elements.toastRegion.appendChild(toast);
+  window.setTimeout(() => toast.remove(), 3200);
+}
+
+/* Populate the account details form from the current in-memory state. */
+function renderAccountForm() {
+  Object.entries(state.account).forEach(([key, value]) => {
+    const field = elements[key];
+    if (field && document.activeElement !== field) field.value = value ?? '';
+  });
+}
+
+/* Update all summary cards using the same calculation as the transaction table. */
+function renderSummaries(ledger) {
+  elements.openingSummary.textContent = formatCurrency(ledger.opening);
+  elements.creditSummary.textContent = formatCurrency(ledger.totalCredit);
+  elements.debitSummary.textContent = formatCurrency(ledger.totalDebit);
+  elements.closingSummary.textContent = formatCurrency(ledger.closing);
+  elements.tableCreditTotal.textContent = formatCurrency(ledger.totalCredit);
+  elements.tableDebitTotal.textContent = formatCurrency(ledger.totalDebit);
+  elements.tableOpeningTotal.textContent = formatCurrency(ledger.opening);
+  elements.tableClosingTotal.textContent = formatCurrency(ledger.closing);
+}
+
+/* Apply search and date filters without changing the underlying ledger records. */
+function getVisibleTransactions(transactions) {
+  const query = elements.searchInput.value.trim().toLowerCase();
+  const from = elements.filterFrom.value;
+  const to = elements.filterTo.value;
+
+  return transactions.filter((transaction) => {
+    const matchesQuery = !query ||
+      String(transaction.id).toLowerCase().includes(query) ||
+      String(transaction.particulars).toLowerCase().includes(query);
+    const matchesFrom = !from || transaction.date >= from;
+    const matchesTo = !to || transaction.date <= to;
+    return matchesQuery && matchesFrom && matchesTo;
+  });
+}
+
+/* Draw the transaction table and keep the serial number and running balance consistent. */
+function renderTransactions(ledger) {
+  const visibleTransactions = getVisibleTransactions(ledger.transactions);
+  elements.transactionCount.textContent = `${ledger.transactions.length} ${ledger.transactions.length === 1 ? 'transaction' : 'transactions'}`;
+
+  if (visibleTransactions.length === 0) {
+    const hasFilters = Boolean(elements.searchInput.value || elements.filterFrom.value || elements.filterTo.value);
+    elements.transactionTableBody.innerHTML = `
+      <tr><td colspan="8" class="empty-state">
+        <span class="empty-icon">▤</span>
+        <strong>${hasFilters ? 'No matching transactions' : 'No transactions yet'}</strong>
+        <small>${hasFilters ? 'Try changing or clearing your search filters.' : 'Add a transaction above to build this account ledger.'}</small>
+      </td></tr>`;
+    return;
+  }
+
+  elements.transactionTableBody.innerHTML = visibleTransactions.map((transaction) => `
+    <tr>
+      <td>${transaction.serialNumber}</td>
+      <td>${formatDate(transaction.date)}</td>
+      <td><span class="transaction-ref">${escapeHtml(transaction.id)}</span></td>
+      <td><span class="particulars-text">${escapeHtml(transaction.particulars)}</span></td>
+      <td class="align-right ${transaction.credit > 0 ? 'positive' : ''}">${transaction.credit > 0 ? formatCurrency(transaction.credit) : '—'}</td>
+      <td class="align-right ${transaction.debit > 0 ? 'negative' : ''}">${transaction.debit > 0 ? formatCurrency(transaction.debit) : '—'}</td>
+      <td class="align-right balance-text">${formatCurrency(transaction.balance)}</td>
+      <td class="action-column no-print"><button class="delete-transaction" type="button" data-delete-id="${escapeHtml(transaction.id)}" aria-label="Delete transaction ${escapeHtml(transaction.id)}" title="Delete transaction">×</button></td>
+    </tr>`).join('');
+}
+
+/* Refresh every data-dependent part of the interface from the current state. */
+function renderApp() {
+  const ledger = calculateLedger();
+  renderSummaries(ledger);
+  renderTransactions(ledger);
+}
+
+/* Read and validate the customer details form before saving it. */
+function saveAccountDetails() {
+  const openingBalance = Number(elements.openingBalance.value || 0);
+  if (!Number.isFinite(openingBalance) || openingBalance < 0) {
+    showToast('Opening balance must be zero or a positive amount.', 'error');
+    elements.openingBalance.focus();
+    return;
+  }
+  if (elements.periodFrom.value && elements.periodTo.value && elements.periodFrom.value > elements.periodTo.value) {
+    showToast('Statement start date cannot be after the end date.', 'error');
+    elements.periodFrom.focus();
+    return;
+  }
+
+  state.account = {
+    holderName: elements.holderName.value.trim(),
+    accountNumber: elements.accountNumber.value.trim(),
+    membershipNumber: elements.membershipNumber.value.trim(),
+    accountType: elements.accountType.value,
+    mobileNumber: elements.mobileNumber.value.trim(),
+    periodFrom: elements.periodFrom.value,
+    periodTo: elements.periodTo.value,
+    openingBalance
+  };
+  persistState();
+  renderApp();
+  showToast('Account details saved successfully.');
+}
+
+/* Generate a readable unique reference for a transaction when the user leaves it blank. */
+function generateTransactionId() {
+  const datePart = new Date().toISOString().slice(0, 10).replaceAll('-', '');
+  let sequence = state.transactions.length + 1;
+  let candidate = `DLCS-${datePart}-${String(sequence).padStart(4, '0')}`;
+  while (state.transactions.some((transaction) => transaction.id === candidate)) {
+    sequence += 1;
+    candidate = `DLCS-${datePart}-${String(sequence).padStart(4, '0')}`;
+  }
+  return candidate;
+}
+
+/* Validate and add a transaction, rejecting negative and simultaneous credit/debit entries. */
+function addTransaction(event) {
+  event.preventDefault();
+  const date = elements.transactionDate.value;
+  const particulars = elements.particulars.value.trim();
+  const creditRaw = elements.creditInput.value.trim();
+  const debitRaw = elements.debitInput.value.trim();
+  const credit = creditRaw === '' ? 0 : Number(creditRaw);
+  const debit = debitRaw === '' ? 0 : Number(debitRaw);
+  const transactionId = elements.transactionId.value.trim() || generateTransactionId();
+
+  if (!date || !particulars) {
+    showToast('Please enter the transaction date and particulars.', 'error');
+    return;
+  }
+  if ((creditRaw !== '' && (!Number.isFinite(credit) || credit < 0)) || (debitRaw !== '' && (!Number.isFinite(debit) || debit < 0))) {
+    showToast('Credit and debit amounts must be zero or positive numbers.', 'error');
+    return;
+  }
+  if ((credit > 0 && debit > 0) || (credit === 0 && debit === 0)) {
+    showToast('Enter an amount in either Credit or Debit, but not both.', 'error');
+    return;
+  }
+  if (state.transactions.some((transaction) => transaction.id.toLowerCase() === transactionId.toLowerCase())) {
+    showToast('That transaction ID already exists. Please use a unique ID.', 'error');
+    elements.transactionId.focus();
+    return;
+  }
+  if (state.account.periodFrom && date < state.account.periodFrom) {
+    showToast('Transaction date is earlier than the statement period.', 'error');
+    return;
+  }
+  if (state.account.periodTo && date > state.account.periodTo) {
+    showToast('Transaction date is later than the statement period.', 'error');
+    return;
+  }
+
+  state.transactions.push({
+    id: transactionId,
+    date,
+    particulars,
+    credit,
+    debit,
+    createdAt: Date.now()
+  });
+  persistState();
+  elements.transactionForm.reset();
+  elements.transactionDate.value = new Date().toISOString().slice(0, 10);
+  renderApp();
+  showToast('Transaction added and running balance updated.');
+  elements.particulars.focus();
+}
+
+/* Remove a selected transaction only after explicit confirmation. */
+function deleteTransaction(transactionId) {
+  const transaction = state.transactions.find((item) => item.id === transactionId);
+  if (!transaction) return;
+  const confirmed = window.confirm(`Delete transaction ${transactionId}? This will recalculate the running balances.`);
+  if (!confirmed) return;
+  state.transactions = state.transactions.filter((item) => item.id !== transactionId);
+  persistState();
+  renderApp();
+  showToast('Transaction deleted and balances recalculated.');
+}
+
+/* Reset the account detail form and current account ledger after confirmation. */
+function clearAccount() {
+  const confirmed = window.confirm('Clear this account and all its transactions from this browser? Export a copy first if you need to keep these records.');
+  if (!confirmed) return;
+  state = createInitialState();
+  persistState();
+  renderAccountForm();
+  elements.searchInput.value = '';
+  elements.filterFrom.value = '';
+  elements.filterTo.value = '';
+  renderApp();
+  showToast('Current account form cleared.');
+}
+
+/* Quote CSV cells so customer-entered text is safe to open in spreadsheet software. */
+function csvCell(value) {
+  const text = String(value ?? '');
+  return `"${text.replaceAll('"', '""')}"`;
+}
+
+/* Export the full chronological statement, including account details and calculated balances. */
+function exportCsv() {
+  const ledger = calculateLedger();
+  const account = state.account;
+  const rows = [
+    ['Delhi Laxmi Co-operative Thrift & Credit Society'],
+    ['Customer Account Transaction Statement'],
+    ['Account Holder', account.holderName],
+    ['Account Number', account.accountNumber],
+    ['Membership Number', account.membershipNumber],
+    ['Account Type', account.accountType],
+    ['Mobile Number', account.mobileNumber],
+    ['Statement From', account.periodFrom],
+    ['Statement To', account.periodTo],
+    ['Opening Balance', ledger.opening.toFixed(2)],
+    [],
+    ['S.No.', 'Date', 'Transaction ID', 'Particulars / Description', 'Credit (INR)', 'Debit (INR)', 'Balance (INR)'],
+    ...ledger.transactions.map((transaction) => [
+      transaction.serialNumber,
+      transaction.date,
+      transaction.id,
+      transaction.particulars,
+      transaction.credit.toFixed(2),
+      transaction.debit.toFixed(2),
+      transaction.balance.toFixed(2)
+    ]),
+    [],
+    ['Total Credit', ledger.totalCredit.toFixed(2)],
+    ['Total Debit', ledger.totalDebit.toFixed(2)],
+    ['Opening Balance', ledger.opening.toFixed(2)],
+    ['Closing Balance', ledger.closing.toFixed(2)]
+  ];
+  const csv = '\uFEFF' + rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const safeAccount = (account.accountNumber || 'customer-account').replace(/[^a-z0-9_-]/gi, '_');
+  link.href = url;
+  link.download = `Delhi-Laxmi-Statement-${safeAccount}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast('CSV statement exported. Open it with Microsoft Excel.');
+}
+
+/* Open the mobile navigation drawer and its page overlay. */
+function openMobileSidebar() {
+  elements.sidebar.classList.add('is-open');
+  elements.mobileOverlay.hidden = false;
+}
+
+/* Close the mobile navigation drawer and restore the page view. */
+function closeMobileSidebar() {
+  elements.sidebar.classList.remove('is-open');
+  elements.mobileOverlay.hidden = true;
+}
+
+/* Connect interface controls to their account, transaction, filter and export actions. */
+function bindEvents() {
+  document.getElementById('saveAccountButton').addEventListener('click', saveAccountDetails);
+  document.getElementById('clearAccountButton').addEventListener('click', clearAccount);
+  elements.transactionForm.addEventListener('submit', addTransaction);
+  elements.transactionTableBody.addEventListener('click', (event) => {
+    const deleteButton = event.target.closest('[data-delete-id]');
+    if (deleteButton) deleteTransaction(deleteButton.dataset.deleteId);
+  });
+  [elements.searchInput, elements.filterFrom, elements.filterTo].forEach((field) => {
+    field.addEventListener('input', renderApp);
+    field.addEventListener('change', renderApp);
+  });
+  document.getElementById('clearFiltersButton').addEventListener('click', () => {
+    elements.searchInput.value = '';
+    elements.filterFrom.value = '';
+    elements.filterTo.value = '';
+    renderApp();
+  });
+  document.getElementById('exportCsvButton').addEventListener('click', exportCsv);
+  document.getElementById('printButton').addEventListener('click', () => window.print());
+  document.getElementById('openSidebar').addEventListener('click', openMobileSidebar);
+  document.getElementById('closeSidebar').addEventListener('click', closeMobileSidebar);
+  elements.mobileOverlay.addEventListener('click', closeMobileSidebar);
+  document.querySelectorAll('.nav-link').forEach((link) => link.addEventListener('click', closeMobileSidebar));
+}
+
+/* Initialise dates, restore saved customer details and render the first ledger view. */
+function initialiseApp() {
+  elements.transactionDate.value = new Date().toISOString().slice(0, 10);
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+  renderAccountForm();
+  bindEvents();
+  renderApp();
+}
+
+initialiseApp();
+  </script>
+</body>
+</html>
